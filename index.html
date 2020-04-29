@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script defer src="face-api.min.js"></script>
+  <script defer src="script.js"></script>
+  <link href="style.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+  <div>
+    <h1>Face Detection using Face-Api.js and TensorFlow</h1>
+  <div class="vidOptionsContainer">
+  <div class="videoContainer">
+    <video id="video" width="720" height="560" autoplay muted></video>
+  </div>
+  <div class="buttonContainer">
+      <button id="showDetections" type="button"> Show Detections</button>
+      <button id="showFaceLandmarks" type="button"> Show Face Landmarks</button>
+      <button id="showFaceExpression" type="button"> Show Face Expression</button>
+      <button id="showAgeAndGender" type="button"> Show Age and Gender</button>
+  </div>
+  </div>
+  </div>
+  <div class="faceValues">
+    <h2 class="warning"></h2>
+    <table id="myTable">
+    </table>
+  </div>
+
+
+</body>
+</html>
