@@ -19,10 +19,17 @@
     <video id="video" width="720" height="560" autoplay muted></video>
   </div>
   <div class="buttonContainer">
-      <button id="showDetections" type="button"> Show Detections</button>
-      <button id="showFaceLandmarks" type="button"> Show Face Landmarks</button>
-      <button id="showFaceExpression" type="button"> Show Face Expression</button>
-      <button id="showAgeAndGender" type="button"> Show Age and Gender</button>
+      <div class="input-container">
+        <h3>Choose an image:</h3>
+        <input type="file" id="imageUpload">
+      </div>
+      <div>
+        <button id="switchCamera" type="button"> Switch To Camera/Image</button>
+        <button id="showDetections" type="button"> Show Detections</button>
+        <button id="showFaceLandmarks" type="button"> Show Face Landmarks</button>
+        <button id="showFaceExpression" type="button"> Show Face Expression</button>
+        <button id="showAgeAndGender" type="button"> Show Age and Gender</button>
+      </div>
   </div>
   </div>
   </div>

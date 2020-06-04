@@ -3,14 +3,34 @@ const showDetections = document.getElementById('showDetections');
 const showFaceLandmarks = document.getElementById('showFaceLandmarks');
 const showFaceExpression = document.getElementById('showFaceExpression');
 const showAgeAndGender = document.getElementById('showAgeAndGender');
+const imageUpload = document.getElementById('imageUpload');
+const switchButton = document.getElementById('switchCamera');
+
 document.querySelector('.warning').innerText = "Loading....";
+switchButton.disabled = true;
 let dec = false;
 let face = false;
 let expr = false;
 let age = false;
+isImage = false;
+let image;
+let canvas;
 
+switchButton.addEventListener('click', function(){
+  isImage = !isImage;
+  if(isImage){
+  document.querySelector('.videoContainer').removeChild(video);
+  document.querySelector('.videoContainer').appendChild(image);
+
+  }else if(!isImage){
+    document.querySelector('.videoContainer').removeChild(image);
+    document.querySelector('.videoContainer').appendChild(video);
+    video.play();
+    
+  }
+})
 showDetections.addEventListener('click', function () {
-  dec = !dec
+  dec = !dec;
 })
 showFaceLandmarks.addEventListener('click', function () {
   face = !face;
@@ -34,7 +54,9 @@ Promise.all([
     //prepoznaje izraze lica 
     faceapi.nets.faceExpressionNet.loadFromUri('/models'),
     //godine / pol 
-    faceapi.nets.ageGenderNet.loadFromUri('/models')
+    faceapi.nets.ageGenderNet.loadFromUri('/models'),
+
+    faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
   ])
   .then(startVideo)
 
@@ -49,12 +71,19 @@ function startVideo() {
 }
 
 
+
+  imageUpload.addEventListener('change', async ()=>{
+     image = await faceapi.bufferToImage(imageUpload.files[0]);
+     canvas = faceapi.createCanvasFromMedia(image);
+  });
+  
+
 video.addEventListener('play', function () {
 
 
-  const canvas = faceapi.createCanvasFromMedia(video);
+  let canvas = faceapi.createCanvasFromMedia(video);
   document.body.querySelector('.videoContainer').appendChild(canvas);
-  const displaySize = {
+  let  displaySize = {
     width: video.width,
     height: video.height
   }
@@ -66,10 +95,31 @@ video.addEventListener('play', function () {
 
 
   setInterval(
+    
     async function () {
+      let detections;
+      if(!image){
+        switchButton.disabled = true;
+      }else{
+        switchButton.disabled = false;
+      }
       // konstanta detections ceka odgovor od faceapi detectAllFaces metode 
       // prosledjujemo sta koristimo da bi detektovali (video) i koju biblioteku. Face landark prikazuje pokrete lica
-      const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions().withAgeAndGender();
+      if(!isImage){
+         detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions().withAgeAndGender();
+         displaySize = {
+          width: video.width,
+          height: video.height
+        }
+        faceapi.matchDimensions(canvas, displaySize);
+        } else {
+        detections =  await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions().withAgeAndGender();
+        displaySize = {
+          width: image.width,
+          height:image.height
+        }
+        faceapi.matchDimensions(canvas, displaySize);
+      }
       //podesava da se prikaz detekcije za video element i canvas element
       const resizedDetections = faceapi.resizeResults(detections, displaySize);
       //resizedDetections[0].gender
@@ -80,10 +130,10 @@ video.addEventListener('play', function () {
         "<th>Num</th>" +
         "<th>Age</th>" +
         "<th>Whole age value</th>" +
-        "<th>Face Expression</th>" +
-        "<th>Probability</th>" +
+        "<th>Expression</th>" +
+        "<th>Exp. Confidence</th>" +
         "<th>Gender</th>" +
-        "<th>Gender Accuracy</th>" +
+        "<th>Gen. Confidence</th>" +
         "</tr>";
 
         if(Object.keys(resizedDetections).length === 0){
